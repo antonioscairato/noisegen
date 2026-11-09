@@ -1,0 +1,12 @@
+# Binários
+/noisegen
+*.exe
+
+# Testes e cobertura
+*.test
+*.out
+
+# Editores e SO
+.idea/
+.vscode/
+.DS_Store

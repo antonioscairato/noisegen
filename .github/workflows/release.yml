@@ -1,0 +1,38 @@
+name: Release
+
+# Ao enviar uma tag como v1.0.0, compila o .exe para Windows e o publica
+# na página de Releases do repositório.
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Testes
+        run: go test ./noise/
+
+      - name: Compilar
+        shell: bash
+        run: |
+          mkdir dist
+          go build -trimpath -ldflags "-s -w" -o dist/noisegen-windows-amd64.exe ./cmd/noisegen
+
+      - name: Publicar Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" dist/noisegen-windows-amd64.exe \
+            --title "${GITHUB_REF_NAME}" --generate-notes
